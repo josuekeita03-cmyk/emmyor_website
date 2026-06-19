@@ -1,0 +1,16 @@
+# SQLite database
+*.db
+*.db-journal
+
+# Dependencies
+node_modules/
+
+# Environment Secrets
+.env
+.env.local
+.env.production
+.env.development
+
+# Next.js Build Output
+.next/
+out/

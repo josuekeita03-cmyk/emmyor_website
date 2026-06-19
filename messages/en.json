@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "shop": "Shop",
+    "farmers": "Farmers",
+    "b2b": "B2B Services",
+    "about": "About",
+    "blog": "Blog",
+    "contact": "Contact",
+    "track": "Track Product",
+    "donate": "Donate"
+  },
+  "home": {
+    "hero": {
+      "title": "Connecting Farmers to Global Markets",
+      "description": "Empowering farmers with direct market access while providing premium agricultural products and innovative solutions.",
+      "shopButton": "Shop Premium Products",
+      "farmerButton": "Join as a Farmer",
+      "b2bButton": "Partner with Us (B2B)"
+    },
+    "features": {
+      "title": "Our Key Features",
+      "description": "Discover how EMMYOR revolutionizes agricultural trade with innovative solutions",
+      "farmer": {
+        "title": "Farmer Platform",
+        "description": "Direct market access and support for small farmers"
+      },
+      "b2b": {
+        "title": "B2B Services",
+        "description": "Comprehensive solutions for businesses including packaging and certification"
+      },
+      "consumer": {
+        "title": "Consumer Products",
+        "description": "High-quality agricultural products with full traceability"
+      }
+    },
+    "testimonials": {
+      "title": "Trusted by Many",
+      "description": "Hear from our satisfied partners and customers"
+    },
+    "track": {
+      "title": "Track Your Product",
+      "description": "Discover the story behind your product and verify its authenticity",
+      "placeholder": "Find the tracking code on your product label or scan the QR code"
+    },
+    "donate": {
+      "title": "Donate to Your Loved Farmers",
+      "description": "Show your appreciation by supporting the farmers who bring you high-quality, natural products. Your contribution helps create sustainable livelihoods and stronger communities.",
+      "button": "Support Our Farmers",
+      "learnMore": "Learn More"
+    },
+    "cta": {
+      "title": "Choose Your Path",
+      "description": "Join EMMYOR today and be part of the agricultural revolution",
+      "shop": "Shop Products",
+      "farmer": "Join as Farmer",
+      "b2b": "B2B Services",
+      "invest": "Invest With Us"
+    }
+  },
+  "footer": {
+    "copyright": "© 2025 EMMYOR. All rights reserved.",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "contact": "Contact"
+  }
+}

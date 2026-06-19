@@ -1,0 +1,525 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Existing tables migrated from SQLite
+model User {
+  id             String               @id @default(cuid())
+  email          String               @unique
+  password       String?
+  fullName       String
+  phoneNumber    String?
+  city           String?
+  role           Role                 @default(CUSTOMER)
+  isActive       Boolean              @default(true)
+  preferredLocale String               @default("en")
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  customer           Customer?
+  farmer             Farmer?
+  cooperative        Cooperative?
+  company            Company?
+  individualProducer IndividualProducer?
+  retailer           Retailer?
+  commercial         Commercial?
+  orders             Order[]
+  accounts           Account[]
+  sessions           Session[]
+
+  @@map("users")
+}
+
+model Customer {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  cartItems    CartItem[]
+  wishlist     Wishlist[]
+  orders       Order[]
+
+  @@map("customers")
+}
+
+model Farmer {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  farmLocation   String?
+  experience     Int?
+  certifications String?  // Stored as JSON array
+
+  products              Product[]
+  farmMedia             FarmMedia[]
+  donationCampaigns     DonationCampaign[]
+  donations             Donation[]
+
+  @@map("farmers")
+}
+
+model Cooperative {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  members        Int?
+  location       String?
+  certifications String?  // Stored as JSON array
+
+  @@map("cooperatives")
+}
+
+model Company {
+  id          String @id @default(cuid())
+  userId      String @unique
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName String?
+  industry    String?
+  size        String?
+
+  b2bConsultations B2BConsultation[]
+  donations         Donation[]
+
+  @@map("companies")
+}
+
+model IndividualProducer {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brandName String?
+
+  products Product[]
+
+  @@map("individual_producers")
+}
+
+model Retailer {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storeName String?
+  location  String?
+
+  @@map("retailers")
+}
+
+model Commercial {
+  id         String @id @default(cuid())
+  userId     String @unique
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department String?
+  employeeId String?
+
+  @@map("commercial")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  nameEn      String   // English name
+  nameAr      String   // Arabic name
+  descriptionEn String? // English description
+  descriptionAr String? // Arabic description
+  price       Float
+  unit        String?
+  origin      String?
+  packaging   String?
+  image       String?
+  category    String?
+  sku         String?  @unique
+  stock       Int?     @default(0)
+  isActive    Boolean  @default(true)
+  farmerId    String?
+  producerId  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  farmer    Farmer?             @relation(fields: [farmerId], references: [id])
+  producer  IndividualProducer? @relation(fields: [producerId], references: [id])
+  cartItems CartItem[]
+  orderItems OrderItem[]
+  wishlist  Wishlist[]
+  productTracking ProductTracking?
+  trackingTimeline TrackingTimeline[]
+  productReviews ProductReview[]
+
+  @@map("products")
+}
+
+model CartItem {
+  id         String   @id @default(cuid())
+  customerId String
+  productId  String
+  quantity   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  userId       String
+  customerId   String?
+  status       OrderStatus @default(PENDING)
+  total        Float
+  paymentMethod PaymentMethod @default(CARD)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  user         User        @relation(fields: [userId], references: [id], map: "orders_userId_fkey")
+  customer     Customer?   @relation(fields: [customerId], references: [id], map: "orders_customerId_fkey")
+  orderItems   OrderItem[]
+  whatsappOrders WhatsappOrder[]
+  payments     Payment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Wishlist {
+  customerId String
+  productId  String
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([customerId, productId])
+  @@map("wishlist")
+}
+
+// New tables
+model ProductTracking {
+  id           String   @id @default(cuid())
+  productId    String   @unique
+  sku          String   @unique
+  qrCodeUrl    String?
+  batchNumber  String?
+  createdAt    DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_tracking")
+}
+
+model TrackingTimeline {
+  id        String           @id @default(cuid())
+  productId String
+  stage     String
+  date      DateTime
+  details   String?
+  type      TrackingType
+  createdAt DateTime         @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("tracking_timeline")
+}
+
+model Donation {
+  id            String         @id @default(cuid())
+  donorId       String?
+  farmerId      String?
+  companyId     String?
+  campaignId    String?
+  amount        Float
+  currency      String         @default("MAD")
+  paymentStatus PaymentStatus  @default(PENDING)
+  message       String?
+  createdAt     DateTime       @default(now())
+
+  farmer   Farmer?           @relation(fields: [farmerId], references: [id])
+  company  Company?          @relation(fields: [companyId], references: [id])
+  campaign DonationCampaign? @relation(fields: [campaignId], references: [id])
+
+  @@map("donations")
+}
+
+model DonationCampaign {
+  id            String           @id @default(cuid())
+  farmerId      String
+  title         String
+  targetAmount  Float
+  currentAmount Float            @default(0)
+  status        CampaignStatus   @default(ACTIVE)
+  deadline      DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  farmer    Farmer     @relation(fields: [farmerId], references: [id])
+  donations Donation[]
+
+  @@map("donation_campaigns")
+}
+
+model B2BConsultation {
+  id           String              @id @default(cuid())
+  companyId    String?
+  companyName  String
+  contactName  String
+  email        String
+  phone        String
+  serviceType  String
+  budget       Float?
+  message      String?
+  status       ConsultationStatus  @default(PENDING)
+  createdAt    DateTime            @default(now())
+
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@map("b2b_consultations")
+}
+
+model FarmerRegistration {
+  id             String           @id @default(cuid())
+  userId         String?
+  farmName       String
+  location       String
+  products       String?          // Stored as JSON array
+  certifications String?          // Stored as JSON array
+  status         RegistrationStatus @default(PENDING)
+  createdAt      DateTime         @default(now())
+
+  @@map("farmer_registrations")
+}
+
+model WhatsappSettings {
+  id              String   @id @default(cuid())
+  phoneNumber     String
+  isActive        Boolean  @default(true)
+  messageTemplate String
+  updatedAt       DateTime @updatedAt
+  updatedBy       String?
+
+  @@map("whatsapp_settings")
+}
+
+model WhatsappOrder {
+  id           String           @id @default(cuid())
+  orderId      String
+  whatsappNumber String
+  messageSent  String
+  sentAt       DateTime
+  status       WhatsappStatus   @default(SENT)
+  createdAt    DateTime         @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("whatsapp_orders")
+}
+
+model ProductReview {
+  id         String   @id @default(cuid())
+  productId  String
+  customerId String
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_reviews")
+}
+
+model FarmMedia {
+  id        String      @id @default(cuid())
+  farmerId  String
+  mediaType MediaType
+  url       String
+  caption   String?
+  createdAt DateTime    @default(now())
+
+  farmer Farmer @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+
+  @@map("farm_media")
+}
+
+model Settings {
+  key         String   @id
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}
+
+// Enums
+enum Role {
+  CUSTOMER
+  FARMER
+  COOPERATIVE
+  COMPANY
+  INDIVIDUAL_PRODUCER
+  RETAILER
+  COMMERCIAL
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  WHATSAPP_PENDING
+}
+
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+  WHATSAPP
+}
+
+enum CardType {
+  VISA
+  MASTERCARD
+  CMI
+  AMEX
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model PaymentGateway {
+  id                String       @id @default(cuid())
+  name              String
+  gatewayType       String       // e.g., "STRIPE", "PAYPAL", "LOCAL"
+  apiKey            String?
+  apiSecret         String?
+  merchantId        String?
+  isActive          Boolean      @default(true)
+  supportedCardTypes CardType[]
+  acquiringBank     String
+  acquiringBankRIB  String
+  paymentProcessor  String
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  payments          Payment[]
+
+  @@map("payment_gateways")
+}
+
+model Payment {
+  id                String       @id @default(cuid())
+  orderId           String
+  gatewayId         String
+  amount            Float
+  currency          String       @default("MAD")
+  status            PaymentStatus @default(PENDING)
+  cardType          CardType?
+  cardLastFour      String?
+  transactionId     String?
+  gatewayResponse   Json?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  order             Order        @relation(fields: [orderId], references: [id])
+  gateway           PaymentGateway @relation(fields: [gatewayId], references: [id])
+
+  @@map("payments")
+}
+
+enum TrackingType {
+  RECEPTION
+  PROCESSING
+  PACKAGING
+}
+
+enum CampaignStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ConsultationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum WhatsappStatus {
+  SENT
+  CONFIRMED
+  CANCELLED
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join as a Farmer - EMMYOR</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <nav class="main-nav">
+                <a href="/" class="logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                        <path d="M12 2L22 8.5V15.5L12 22L2 15.5V8.5L12 2Z"/>
+                        <path d="M12 22V15.5"/>
+                        <path d="M22 8.5L12 15.5L2 8.5"/>
+                        <path d="M12 2V8.5"/>
+                        <path d="M12 15.5L22 8.5"/>
+                        <path d="M12 15.5L2 8.5"/>
+                    </svg>
+                    <span>EMMYOR</span>
+                </a>
+                <div class="nav-links">
+                    <a href="/farmers.html">For Farmers</a>
+                    <a href="/b2b.html">B2B Services</a>
+                    <a href="/shop.html">Shop</a>
+                    <a href="/about.html">About</a>
+                </div>
+                <div class="auth-buttons">
+                    <a href="/login.html" class="btn btn-ghost">Sign In</a>
+                    <a href="/register.html" class="btn btn-primary">Sign Up</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Join as a Farmer</h1>
+                <p>At EMMYOR, we believe in empowering small-scale farmers by providing direct access to global markets.
+                    Let us help you grow your business while ensuring fair trade practices and sustainable agriculture.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <div class="grid-2">
+                <div class="benefits-list">
+                    <h2>Benefits for Farmers</h2>
+                    <ul class="feature-list">
+                        <li>
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" class="icon-circle"/>
+                                <path d="M8 12l2 2 4-4" class="icon-check"/>
+                            </svg>
+                            <div>
+                                <h3>Direct Market Access</h3>
+                                <p>Connect with buyers without intermediaries and maximize your profits</p>
+                            </div>
+                        </li>
+                        <li>
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" class="icon-circle"/>
+                                <path d="M8 12l2 2 4-4" class="icon-check"/>
+                            </svg>
+                            <div>
+                                <h3>Fair Pricing</h3>
+                                <p>Get competitive prices for your products with transparent pricing structures</p>
+                            </div>
+                        </li>
+                        <li>
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" class="icon-circle"/>
+                                <path d="M8 12l2 2 4-4" class="icon-check"/>
+                            </svg>
+                            <div>
+                                <h3>Complete Traceability</h3>
+                                <p>Track your products from farm to shelf with our advanced system</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="how-it-works">
+                    <h2>How It Works</h2>
+                    <div class="steps">
+                        <div class="step-card">
+                            <span class="step-number">1</span>
+                            <h3>Register Your Farm</h3>
+                            <p>Sign up on our platform and provide details about your farm and produce</p>
+                        </div>
+                        <div class="step-card">
+                            <span class="step-number">2</span>
+                            <h3>List Raw Materials</h3>
+                            <p>Add your products with details about quantity, quality, and pricing</p>
+                        </div>
+                        <div class="step-card">
+                            <span class="step-number">3</span>
+                            <h3>Receive Offers</h3>
+                            <p>Get offers from buyers or let EMMYOR process your materials</p>
+                        </div>
+                        <div class="step-card">
+                            <span class="step-number">4</span>
+                            <h3>Track Progress</h3>
+                            <p>Monitor your products' journey using our trackability system</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Form -->
+    <section class="registration">
+        <div class="container">
+            <div class="form-container">
+                <h2>Register Your Farm</h2>
+                <p>Fill out the form below to start listing your raw materials on the EMMYOR platform</p>
+                
+                <form id="farmerRegistration" class="registration-form">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required minlength="2">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="farmLocation">Farm Location</label>
+                        <input type="text" id="farmLocation" name="farmLocation" required placeholder="e.g., Samassa, Agadir">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="produceType">Type of Produce</label>
+                        <select id="produceType" name="produceType" required>
+                            <option value="">Select your main produce</option>
+                            <option value="peanuts">Peanuts</option>
+                            <option value="almonds">Almonds</option>
+                            <option value="argan">Argan Oil</option>
+                            <option value="saffron">Saffron</option>
+                            <option value="olives">Olives</option>
+                            <option value="dates">Dates</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quantity">Quantity Available</label>
+                            <input type="text" id="quantity" name="quantity" required placeholder="e.g., 1000">
+                            <small>Enter amount in kg or liters</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">Price per Unit</label>
+                            <input type="text" id="price" name="price" required placeholder="e.g., 2.50">
+                            <small>Price in USD per kg/liter</small>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="+212...">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additionalInfo">Additional Information</label>
+                        <textarea id="additionalInfo" name="additionalInfo" rows="4" 
+                            placeholder="Any additional details about your produce or farming practices"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-large">Start Selling Today</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Table -->
+    <section class="pricing">
+        <div class="container">
+            <h2>Raw Materials Price Guide</h2>
+            <p>Current suggested price ranges for common agricultural products in Morocco</p>
+            
+            <div class="table-container">
+                <table class="price-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Description</th>
+                            <th>Price Range (per kg/liter)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Peanuts</td>
+                            <td>Raw peanuts with hulls</td>
+                            <td>$1.50 - $2.00</td>
+                        </tr>
+                        <tr>
+                            <td>Almonds</td>
+                            <td>Raw almonds</td>
+                            <td>$6.00 - $8.00</td>
+                        </tr>
+                        <tr>
+                            <td>Argan Oil</td>
+                            <td>Unrefined argan oil</td>
+                            <td>$20.00 - $30.00</td>
+                        </tr>
+                        <tr>
+                            <td>Saffron</td>
+                            <td>High-quality saffron threads</td>
+                            <td>$800.00 - $1,200.00</td>
+                        </tr>
+                        <tr>
+                            <td>Olives</td>
+                            <td>Fresh olives for oil production</td>
+                            <td>$0.80 - $1.20</td>
+                        </tr>
+                        <tr>
+                            <td>Olive Oil</td>
+                            <td>Virgin olive oil</td>
+                            <td>$5.00 - $7.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note">*Prices are estimates and may vary based on market conditions, quality, and seasonality</p>
+        </div>
+    </section>
+
+    <!-- Support Section -->
+    <section class="support">
+        <div class="container">
+            <div class="support-content">
+                <h2>Need Help?</h2>
+                <p>Our support team is here to assist you with any questions</p>
+                <div class="contact-info">
+                    <p>Email: support@emmyor.com</p>
+                    <p>Phone: +212 123 456 789</p>
+                    <p>Live Chat: Available during business hours</p>
+                </div>
+                <a href="/contact.html" class="btn btn-primary btn-large">Contact Support</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2024 EMMYOR. All rights reserved.</p>
+                <nav class="footer-links">
+                    <a href="/terms.html">Terms</a>
+                    <a href="/privacy.html">Privacy</a>
+                    <a href="/contact.html">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
