@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import crypto from "crypto"
 import { sendCommercialOnboardingEmail } from "@/lib/email"
+import { authOptions } from "@/lib/auth"
 
 // GET /api/admin/team - Fetch all commercial users
 export async function GET() {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
     if (!session || session.user?.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -43,7 +44,7 @@ export async function GET() {
 // POST /api/admin/team - Create new commercial user
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
     if (!session || session.user?.role !== "ADMIN") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

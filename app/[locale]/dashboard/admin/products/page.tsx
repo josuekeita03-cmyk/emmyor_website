@@ -22,9 +22,9 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<any>(null)
   const [formData, setFormData] = useState({
-    name: "",
+    nameEn: "",
     nameAr: "",
-    description: "",
+    descriptionEn: "",
     descriptionAr: "",
     price: "",
     unit: "",
@@ -32,12 +32,27 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
     category: "",
     stock: "",
     image: "",
+    sku: "",
+    farmerId: "",
     isActive: true,
   })
+  const [farmers, setFarmers] = useState<any[]>([])
+  const [farmerSearch, setFarmerSearch] = useState("")
 
   useEffect(() => {
     fetchProducts()
+    fetchFarmers()
   }, [])
+
+  const fetchFarmers = async () => {
+    try {
+      const response = await fetch("/api/admin/farmers")
+      const data = await response.json()
+      setFarmers(data.farmers || [])
+    } catch (error) {
+      console.error("Error fetching farmers:", error)
+    }
+  }
 
   const fetchProducts = async () => {
     try {
@@ -80,9 +95,9 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
   const handleEdit = (product: any) => {
     setEditingProduct(product)
     setFormData({
-      name: product.name,
+      nameEn: product.nameEn || product.name || "",
       nameAr: product.nameAr || "",
-      description: product.description,
+      descriptionEn: product.descriptionEn || product.description || "",
       descriptionAr: product.descriptionAr || "",
       price: product.price.toString(),
       unit: product.unit,
@@ -90,6 +105,8 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
       category: product.category,
       stock: product.stock.toString(),
       image: product.image || "",
+      sku: product.sku || "",
+      farmerId: product.farmerId || "",
       isActive: product.isActive !== false,
     })
     setIsDialogOpen(true)
@@ -129,9 +146,9 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
 
   const resetForm = () => {
     setFormData({
-      name: "",
+      nameEn: "",
       nameAr: "",
-      description: "",
+      descriptionEn: "",
       descriptionAr: "",
       price: "",
       unit: "",
@@ -139,14 +156,19 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
       category: "",
       stock: "",
       image: "",
+      sku: "",
+      farmerId: "",
       isActive: true,
     })
     setEditingProduct(null)
   }
 
   const filteredProducts = products.filter(p =>
-    (p.name && p.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()))
+    p && (
+      (p.nameEn && p.nameEn.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (p.name && p.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
   )
 
   if (loading) {
@@ -197,11 +219,11 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="name">Name (EN)</Label>
+                      <Label htmlFor="nameEn">Name (EN)</Label>
                       <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        id="nameEn"
+                        value={formData.nameEn}
+                        onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
                         placeholder="Enter product name in English"
                         required
                       />
@@ -239,6 +261,39 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                         placeholder="0"
                         required
                       />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="sku">SKU *</Label>
+                      <Input
+                        id="sku"
+                        value={formData.sku}
+                        onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                        placeholder="SKU-001"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="farmer">Farmer *</Label>
+                      <Select
+                        value={formData.farmerId}
+                        onValueChange={(value) => setFormData({ ...formData, farmerId: value })}
+                        required
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a farmer" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {farmers
+                            .filter(f => f.user.fullName.toLowerCase().includes(farmerSearch.toLowerCase()))
+                            .map((farmer) => (
+                              <SelectItem key={farmer.id} value={farmer.id}>
+                                {farmer.user.fullName}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -282,11 +337,11 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="description">Description (EN)</Label>
+                    <Label htmlFor="descriptionEn">Description (EN)</Label>
                     <Input
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      id="descriptionEn"
+                      value={formData.descriptionEn}
+                      onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
                       placeholder="Enter product description in English"
                       required
                     />
@@ -372,7 +427,7 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
               ) : (
                 filteredProducts.map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell className="font-medium">{product.nameEn || product.name || "-"}</TableCell>
                     <TableCell>{product.nameAr || "-"}</TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>{product.price} DH</TableCell>

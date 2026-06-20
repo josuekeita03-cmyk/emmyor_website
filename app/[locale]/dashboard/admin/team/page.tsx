@@ -1,3 +1,6 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -5,43 +8,76 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Search, Plus, Mail, Shield, UserCheck, UserX, ArrowLeft } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Plus, ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
 import type { Locale } from "@/lib/i18n-config"
 
-export default async function AdminTeam({ params }: { params: { locale: Locale } }) {
+export default function AdminTeam({ params }: { params: { locale: Locale } }) {
   const { locale } = params
-  const session = await getServerSession(authOptions)
-  
-  if (!session?.user || session.user.role !== "ADMIN") {
+  const [commercials, setCommercials] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [addFormData, setAddFormData] = useState({
+    fullName: "",
+    email: ""
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+
+  useEffect(() => {
+    fetchCommercials()
+  }, [])
+
+  const fetchCommercials = async () => {
+    try {
+      const response = await fetch("/api/admin/team")
+      const data = await response.json()
+      setCommercials(data.commercials || [])
+    } catch (error) {
+      console.error("Error fetching commercials:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddCommercial = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setMessage(null)
+
+    try {
+      const response = await fetch("/api/admin/team", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(addFormData),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage({ type: 'success', text: `Commercial user created successfully. Email sent to ${addFormData.email}` })
+        setAddFormData({ fullName: "", email: "" })
+        await fetchCommercials()
+        setTimeout(() => setIsAddDialogOpen(false), 2000)
+      } else {
+        setMessage({ type: 'error', text: data.error || "Failed to create commercial user" })
+      }
+    } catch (error) {
+      console.error("Error creating commercial:", error)
+      setMessage({ type: 'error', text: "Network error. Please try again." })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (loading) {
     return (
       <div className="container py-10">
-        <div className="text-center text-red-600">Unauthorized</div>
+        <div className="text-center">Loading...</div>
       </div>
     )
   }
-
-  const commercials = await prisma.commercial.findMany({
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          fullName: true,
-          isActive: true,
-          createdAt: true,
-        },
-      },
-    },
-    orderBy: {
-      user: {
-        createdAt: "desc",
-      },
-    },
-  })
 
   return (
     <div className="container mx-auto py-6">
@@ -59,7 +95,61 @@ export default async function AdminTeam({ params }: { params: { locale: Locale }
 
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>Commercial Staff ({commercials.length})</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Commercial Staff ({commercials.length})</CardTitle>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Commercial
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Commercial Staff</DialogTitle>
+                  <DialogDescription>
+                    Enter the commercial staff member's details. The system will generate a password and send it via email.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddCommercial} className="space-y-4">
+                  <div>
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      value={addFormData.fullName}
+                      onChange={(e) => setAddFormData({ ...addFormData, fullName: e.target.value })}
+                      placeholder="John Doe"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={addFormData.email}
+                      onChange={(e) => setAddFormData({ ...addFormData, email: e.target.value })}
+                      placeholder="john@emmyor.com"
+                      required
+                    />
+                  </div>
+                  {message && (
+                    <div className={`text-sm p-3 rounded-md ${message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                      {message.text}
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? "Creating..." : "Create Commercial"}
+                    </Button>
+                    <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>

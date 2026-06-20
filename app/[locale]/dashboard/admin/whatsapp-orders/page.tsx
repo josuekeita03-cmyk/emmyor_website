@@ -9,35 +9,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { ArrowLeft, Check, X, Search, Download } from "lucide-react"
+import { ArrowLeft, Check, X, Search, Download, MessageSquare } from "lucide-react"
 import Link from "next/link"
 import type { Locale } from "@/lib/i18n-config"
 
-export default function AdminOrders({ params }: { params: { locale: Locale } }) {
+export default function AdminWhatsAppOrders({ params }: { params: { locale: Locale } }) {
   const { locale } = params
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState("all")
   const [customerFilter, setCustomerFilter] = useState("")
-  const [dateFilter, setDateFilter] = useState("")
   const [selectedOrder, setSelectedOrder] = useState<any>(null)
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
 
   useEffect(() => {
     fetchOrders()
-  }, [statusFilter, customerFilter, dateFilter])
+  }, [statusFilter, customerFilter])
 
   const fetchOrders = async () => {
     try {
       const params = new URLSearchParams()
-      if (statusFilter !== "all") params.append("status", statusFilter)
+      params.append("status", "WHATSAPP_PENDING")
       if (customerFilter) params.append("search", customerFilter)
       
       const response = await fetch(`/api/admin/orders?${params.toString()}`)
       const data = await response.json()
       setOrders(data.orders || [])
     } catch (error) {
-      console.error("Error fetching orders:", error)
+      console.error("Error fetching WhatsApp orders:", error)
     } finally {
       setLoading(false)
     }
@@ -58,7 +57,7 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
         await fetchOrders()
       }
     } catch (error) {
-      console.error("Error accepting order:", error)
+      console.error("Error accepting WhatsApp order:", error)
     }
   }
 
@@ -77,7 +76,7 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
         await fetchOrders()
       }
     } catch (error) {
-      console.error("Error rejecting order:", error)
+      console.error("Error rejecting WhatsApp order:", error)
     }
   }
 
@@ -102,7 +101,7 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
         setIsDetailDialogOpen(false)
       }
     } catch (error) {
-      console.error("Error changing order status:", error)
+      console.error("Error changing WhatsApp order status:", error)
     }
   }
 
@@ -124,19 +123,18 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `orders_${new Date().toISOString().split("T")[0]}.csv`
+    a.download = `whatsapp_orders_${new Date().toISOString().split("T")[0]}.csv`
     a.click()
     window.URL.revokeObjectURL(url)
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "PENDING": return "bg-yellow-100 text-yellow-800"
+      case "WHATSAPP_PENDING": return "bg-orange-100 text-orange-800"
       case "PROCESSING": return "bg-blue-100 text-blue-800"
       case "SHIPPED": return "bg-purple-100 text-purple-800"
       case "DELIVERED": return "bg-green-100 text-green-800"
       case "CANCELLED": return "bg-red-100 text-red-800"
-      case "WHATSAPP_PENDING": return "bg-orange-100 text-orange-800"
       default: return "bg-gray-100 text-gray-800"
     }
   }
@@ -144,7 +142,7 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
   if (loading) {
     return (
       <div className="container py-10">
-        <div className="text-center">Loading orders...</div>
+        <div className="text-center">Loading WhatsApp orders...</div>
       </div>
     )
   }
@@ -161,14 +159,14 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
       </div>
 
       <DashboardHeader
-        title="Order Management"
-        description="View and manage customer orders"
+        title="WhatsApp Order Management"
+        description="Manage orders received via WhatsApp"
       />
 
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Orders ({orders.length})</CardTitle>
+            <CardTitle>WhatsApp Orders ({orders.length})</CardTitle>
             <Button onClick={handleExportOrders} variant="outline">
               <Download className="h-4 w-4 mr-2" />
               Export CSV
@@ -192,12 +190,11 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="PENDING">Pending</SelectItem>
+                <SelectItem value="WHATSAPP_PENDING">WhatsApp Pending</SelectItem>
                 <SelectItem value="PROCESSING">Processing</SelectItem>
                 <SelectItem value="SHIPPED">Shipped</SelectItem>
                 <SelectItem value="DELIVERED">Delivered</SelectItem>
                 <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                <SelectItem value="WHATSAPP_PENDING">WhatsApp Pending</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -211,7 +208,6 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
                 <TableHead>Email</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Payment</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -219,15 +215,18 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
             <TableBody>
               {orders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                    No orders found
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    No WhatsApp orders found
                   </TableCell>
                 </TableRow>
               ) : (
                 orders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell className="font-medium">
-                      {order.id.substring(0, 8).toUpperCase()}
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4 text-green-600" />
+                        {order.id.substring(0, 8).toUpperCase()}
+                      </div>
                     </TableCell>
                     <TableCell>{order.user.fullName || "N/A"}</TableCell>
                     <TableCell>{order.user.email}</TableCell>
@@ -237,7 +236,6 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
                         {order.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{order.paymentMethod}</TableCell>
                     <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
@@ -249,13 +247,13 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
                         >
                           View
                         </Button>
-                        {order.status === "PENDING" && (
+                        {order.status === "WHATSAPP_PENDING" && (
                           <>
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => handleAcceptOrder(order.id)}
-                              title="Accept Order"
+                              title="Confirm Order"
                             >
                               <Check className="h-4 w-4" />
                             </Button>
@@ -282,7 +280,7 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Order Details</DialogTitle>
+            <DialogTitle>WhatsApp Order Details</DialogTitle>
             <DialogDescription>
               Order {selectedOrder?.id?.substring(0, 8).toUpperCase()}
             </DialogDescription>
@@ -316,7 +314,7 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
                         <SelectValue placeholder="Change status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="PENDING">Pending</SelectItem>
+                        <SelectItem value="WHATSAPP_PENDING">WhatsApp Pending</SelectItem>
                         <SelectItem value="PROCESSING">Processing</SelectItem>
                         <SelectItem value="SHIPPED">Shipped</SelectItem>
                         <SelectItem value="DELIVERED">Delivered</SelectItem>
@@ -328,10 +326,6 @@ export default function AdminOrders({ params }: { params: { locale: Locale } }) 
                 <div>
                   <p className="text-sm text-muted-foreground">Total</p>
                   <p className="font-medium">{selectedOrder.total} DH</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Payment Method</p>
-                  <p className="font-medium">{selectedOrder.paymentMethod}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Order Date</p>

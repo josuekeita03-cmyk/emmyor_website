@@ -37,9 +37,7 @@ export default async function AdminDashboard({ params }: { params: { locale: Loc
   const totalRevenue = completedOrders.reduce((sum, order) => sum + order.total, 0)
   const activeOrders = await prisma.order.count({
     where: {
-      status: {
-        in: ["PENDING", "PROCESSING", "SHIPPED"]
-      }
+      status: "PENDING"
     }
   })
   const pendingFarmerRegistrations = await prisma.user.count({
@@ -53,7 +51,12 @@ export default async function AdminDashboard({ params }: { params: { locale: Loc
       status: "PENDING"
     }
   })
-  const pendingApprovals = pendingFarmerRegistrations + pendingOrders
+  const pendingConsultations = await prisma.b2BConsultation.count({
+    where: {
+      status: "PENDING"
+    }
+  })
+  const pendingApprovals = pendingFarmerRegistrations + pendingOrders + pendingConsultations
   const lowStockProducts = await prisma.product.count({
     where: {
       stock: {

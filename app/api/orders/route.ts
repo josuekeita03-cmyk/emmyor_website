@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         customerId: user.customer.id,
         total,
-        status: paymentMethod === "WHATSAPP" ? "WHATSAPP_PENDING" : "PENDING",
+        status: "PENDING",
         paymentMethod: paymentMethod as any,
         orderItems: {
           create: cartItems.map((item) => ({

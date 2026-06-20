@@ -19,9 +19,21 @@ const consultationSchema = z.object({
 // POST /api/b2b/consultations - Create a new B2B consultation
 export async function POST(request: NextRequest) {
   try {
-    // Allow public submissions without authentication
+    const session = await getServerSession(authOptions)
     const body = await request.json()
     const validatedData = consultationSchema.parse(body)
+
+    let companyId: string | null = null
+
+    // If user is logged in as COMPANY, link to their company record
+    if (session?.user?.role === "COMPANY") {
+      const company = await prisma.company.findUnique({
+        where: { userId: session.user.id }
+      })
+      if (company) {
+        companyId = company.id
+      }
+    }
 
     // Create consultation record
     const consultation = await prisma.b2BConsultation.create({
@@ -34,6 +46,7 @@ export async function POST(request: NextRequest) {
         budget: validatedData.budget ? parseFloat(validatedData.budget) : null,
         message: validatedData.message,
         status: "PENDING",
+        companyId,
       },
     })
 

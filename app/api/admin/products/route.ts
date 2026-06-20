@@ -108,13 +108,14 @@ export async function POST(request: NextRequest) {
       category,
       sku,
       stock,
+      farmerId,
       isActive = true
     } = body
 
     // Validate required fields
-    if (!nameEn || !nameAr || !price || !category) {
+    if (!nameEn || !nameAr || !price || !category || !sku || !farmerId) {
       return NextResponse.json(
-        { error: "Missing required fields: nameEn, nameAr, price, category" },
+        { error: "Missing required fields: nameEn, nameAr, price, category, sku, farmerId" },
         { status: 400 }
       )
     }
@@ -133,6 +134,7 @@ export async function POST(request: NextRequest) {
         category,
         sku,
         stock: parseInt(stock) || 0,
+        farmerId,
         isActive
       }
     })

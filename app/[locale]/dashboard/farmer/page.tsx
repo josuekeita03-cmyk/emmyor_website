@@ -37,40 +37,23 @@ export default function FarmerDashboard({ params }: { params: { locale: Locale }
         const listingsData = await listingsRes.json()
         setProducts(listingsData.products || [])
 
+        // Fetch pending offers (orders with farmer's products that are pending)
+        const offersRes = await fetch("/api/farmers/offers")
+        const offersData = await offersRes.json()
+        setOffers(offersData.offers || [])
+
+        // Fetch active shipments (orders with farmer's products that are shipped/processing)
+        const shipmentsRes = await fetch("/api/farmers/shipments")
+        const shipmentsData = await shipmentsRes.json()
+        setShipments(shipmentsData.shipments || [])
+
         // Calculate monthly revenue from orders
-        const ordersRes = await fetch("/api/orders")
-        const ordersData = await ordersRes.json()
-        
-        // Filter orders for this farmer's products and calculate revenue
-        const farmerProductIds = (listingsData.products || []).map((p: any) => p.id)
-        const farmerOrders = (ordersData.orders || []).filter((order: any) => 
-          order.orderItems.some((item: any) => farmerProductIds.includes(item.productId))
-        )
-        
-        // Calculate revenue for current month
-        const currentMonth = new Date().getMonth()
-        const currentYear = new Date().getFullYear()
-        const monthlyRevenue = farmerOrders
-          .filter((order: any) => {
-            const orderDate = new Date(order.createdAt)
-            return orderDate.getMonth() === currentMonth && orderDate.getFullYear() === currentYear
-          })
-          .reduce((sum: number, order: any) => sum + order.total, 0)
-        
-        setMonthlyRevenue(monthlyRevenue)
+        const ordersRes = await fetch("/api/farmers/revenue")
+        const revenueData = await ordersRes.json()
+        setMonthlyRevenue(revenueData.monthlyRevenue || 0)
       } else {
         setHasFarmerProfile(false)
       }
-
-      // Fetch offers (placeholder - would need API endpoint)
-      // const offersRes = await fetch("/api/farmers/offers")
-      // const offersData = await offersRes.json()
-      // setOffers(offersData.offers || [])
-
-      // Fetch shipments (placeholder - would need API endpoint)
-      // const shipmentsRes = await fetch("/api/farmers/shipments")
-      // const shipmentsData = await shipmentsRes.json()
-      // setShipments(shipmentsData.shipments || [])
     } catch (error) {
       console.error("Error fetching farmer data:", error)
     } finally {
@@ -229,28 +212,6 @@ export default function FarmerDashboard({ params }: { params: { locale: Locale }
           </CardContent>
         </Card>
       </div>
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <Button asChild>
-              <Link href={`/${locale}/dashboard/farmer/list-materials`}>
-                <ListPlus className="mr-2 h-4 w-4" />
-                Add New Listing
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href={`/${locale}/dashboard/farmer/certifications`}>Request Certification</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href={`/${locale}/dashboard/farmer/analytics`}>View Analytics</Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { sendOrderStatusUpdateEmail } from "@/lib/email"
 
 // GET /api/admin/orders - Get all orders with pagination and filters (ADMIN/COMMERCIAL only)
 export async function GET(request: NextRequest) {
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
             include: {
               product: {
                 select: {
-                  name: true,
+                  nameEn: true,
                   image: true
                 }
               }
@@ -124,11 +125,30 @@ export async function PUT(request: NextRequest) {
             email: true,
             fullName: true
           }
+        },
+        orderItems: {
+          include: {
+            product: {
+              select: {
+                nameEn: true
+              }
+            }
+          }
         }
       }
     })
 
-    // TODO: Send status update email to customer
+    // Send status update email to customer
+    try {
+      await sendOrderStatusUpdateEmail(
+        order.user.email,
+        order.user.fullName || "Customer",
+        order.id,
+        status
+      )
+    } catch (emailError) {
+      console.error("Failed to send order status update email:", emailError)
+    }
 
     return NextResponse.json({ order })
   } catch (error) {
