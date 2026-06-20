@@ -18,11 +18,18 @@ export default function LoginPage({ params }: { params: { locale: Locale } }) {
 
         <LoginForm />
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center space-y-2">
           <span className="text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link href={`/${locale}/register`} className="text-primary hover:underline">
               Sign up here
+            </Link>
+          </span>
+          <br />
+          <span className="text-sm text-muted-foreground">
+            Want to join as a farmer?{" "}
+            <Link href={`/${locale}/farmer-registration`} className="text-primary hover:underline">
+              Register as a farmer
             </Link>
           </span>
         </div>

@@ -243,7 +243,7 @@ export default function B2BPage({ params }: { params: { locale: Locale } }) {
                       id="budget"
                       type="number"
                       min="0"
-                      step="1000"
+                      step="1"
                       placeholder="50000"
                       value={formData.budget}
                       onChange={(e) => setFormData({ ...formData, budget: e.target.value })}

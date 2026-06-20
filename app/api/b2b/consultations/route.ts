@@ -19,16 +19,13 @@ const consultationSchema = z.object({
 // POST /api/b2b/consultations - Create a new B2B consultation
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    // Allow consultations from authenticated users (COMPANY) or public submissions
+    // Allow public submissions without authentication
     const body = await request.json()
     const validatedData = consultationSchema.parse(body)
 
     // Create consultation record
     const consultation = await prisma.b2BConsultation.create({
       data: {
-        companyId: session?.user?.id || null,
         companyName: validatedData.companyName,
         contactName: validatedData.contactName,
         email: validatedData.email,
@@ -40,16 +37,21 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Send notification email to B2B team
-    await sendB2BConsultationReceivedEmail(
-      validatedData.companyName,
-      validatedData.contactName,
-      validatedData.email,
-      validatedData.phone,
-      validatedData.serviceType,
-      validatedData.budget || "Not specified",
-      validatedData.message
-    )
+    // Send notification email to B2B team (don't block on email failure)
+    try {
+      await sendB2BConsultationReceivedEmail(
+        validatedData.companyName,
+        validatedData.contactName,
+        validatedData.email,
+        validatedData.phone,
+        validatedData.serviceType,
+        validatedData.budget || "Not specified",
+        validatedData.message
+      )
+    } catch (emailError) {
+      console.error("Failed to send B2B consultation email:", emailError)
+      // Continue even if email fails
+    }
 
     return NextResponse.json({
       success: true,

@@ -53,6 +53,19 @@ export async function middleware(request: NextRequest) {
 
   // Admin-only routes
   const isAdminRoute = pathname.includes("/admin")
+  
+  // Role-specific dashboard routes
+  const roleRoutes = {
+    "/dashboard/farmer": "FARMER",
+    "/dashboard/cooperative": "COOPERATIVE",
+    "/dashboard/company": "COMPANY",
+    "/dashboard/individual-producer": "INDIVIDUAL_PRODUCER",
+    "/dashboard/retailer": "RETAILER",
+    "/dashboard/commercial": "COMMERCIAL",
+  }
+  
+  const matchedRoleRoute = Object.keys(roleRoutes).find(route => pathname.includes(route))
+  const requiredRole = matchedRoleRoute ? roleRoutes[matchedRoleRoute as keyof typeof roleRoutes] : null
 
   // Don't redirect if already on login page
   const isLoginPage = pathname.includes("/login")
@@ -66,6 +79,12 @@ export async function middleware(request: NextRequest) {
 
     // Check admin role for admin routes
     if (isAdminRoute && token.role !== "ADMIN" && token.role !== "COMMERCIAL") {
+      return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url))
+    }
+
+    // Check role-specific dashboard routes (ADMIN cannot access farmer-specific routes)
+    if (requiredRole && token.role !== requiredRole) {
+      // Redirect to appropriate dashboard based on user's role
       return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url))
     }
   }

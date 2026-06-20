@@ -145,8 +145,8 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
   }
 
   const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.category?.toLowerCase().includes(searchQuery.toLowerCase())
+    (p.name && p.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (p.category && p.category.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   if (loading) {
@@ -202,6 +202,7 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                         id="name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Enter product name in English"
                         required
                       />
                     </div>
@@ -211,6 +212,7 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                         id="nameAr"
                         value={formData.nameAr}
                         onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
+                        placeholder="Enter product name in Arabic"
                       />
                     </div>
                   </div>
@@ -223,6 +225,7 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                         step="0.01"
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        placeholder="0.00"
                         required
                       />
                     </div>
@@ -233,6 +236,7 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                         type="number"
                         value={formData.stock}
                         onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                        placeholder="0"
                         required
                       />
                     </div>
@@ -283,6 +287,7 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                       id="description"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Enter product description in English"
                       required
                     />
                   </div>
@@ -292,6 +297,7 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                       id="descriptionAr"
                       value={formData.descriptionAr}
                       onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
+                      placeholder="Enter product description in Arabic"
                     />
                   </div>
                   <div>
@@ -346,7 +352,8 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product</TableHead>
+                <TableHead>Name (EN)</TableHead>
+                <TableHead>Name (AR)</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Stock</TableHead>
@@ -358,7 +365,7 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
             <TableBody>
               {filteredProducts.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     No products found
                   </TableCell>
                 </TableRow>
@@ -366,6 +373,7 @@ export default function AdminProducts({ params }: { params: { locale: Locale } }
                 filteredProducts.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell>{product.nameAr || "-"}</TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>{product.price} DH</TableCell>
                     <TableCell>

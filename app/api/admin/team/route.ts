@@ -50,10 +50,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { fullName, email, department } = body
+    const { fullName, email } = body
 
     // Validate input
-    if (!fullName || !email || !department) {
+    if (!fullName || !email) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     const commercial = await prisma.commercial.create({
       data: {
         userId: user.id,
-        department,
+        department: "Commercial",
         employeeId,
       },
     })
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     console.log(`Commercial created - Email: ${email}, Password: ${password}, Employee ID: ${employeeId}`)
 
     // Send onboarding email
-    await sendCommercialOnboardingEmail(email, fullName, password, employeeId, department)
+    await sendCommercialOnboardingEmail(email, fullName, password, employeeId, "Commercial")
 
     return NextResponse.json({
       success: true,

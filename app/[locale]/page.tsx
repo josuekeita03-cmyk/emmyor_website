@@ -68,7 +68,7 @@ export default function Home({ params }: { params: { locale: Locale } }) {
                   </Link>
                 </Button>
                 <Button asChild size="lg">
-                  <Link href={`/${locale}/farmers`}>
+                  <Link href={`/${locale}/farmer-registration`}>
                     {t.hero.farmerButton}
                     <ChevronRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -237,7 +237,7 @@ export default function Home({ params }: { params: { locale: Locale } }) {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="w-full bg-transparent">
-                <Link href={`/${locale}/farmers/register`}>
+                <Link href={`/${locale}/farmer-registration`}>
                   <Tractor className="mr-2 h-4 w-4" />
                   {t.cta.farmer}
                 </Link>

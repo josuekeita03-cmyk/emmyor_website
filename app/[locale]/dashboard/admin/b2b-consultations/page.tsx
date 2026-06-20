@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FileText, Filter, CheckCircle, XCircle, Clock, DollarSign } from "lucide-react"
+import { FileText, Filter, CheckCircle, XCircle, Clock, DollarSign, ArrowLeft } from "lucide-react"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 import type { Locale } from "@/lib/i18n-config"
 import {
   Tooltip,
@@ -94,6 +95,15 @@ export default function B2BConsultationsPage({ params }: { params: { locale: Loc
 
   return (
     <div className="container py-10">
+      <div className="mb-6">
+        <Link href={`/${locale}/dashboard/admin`}>
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </Link>
+      </div>
+
       <DashboardHeader
         title={`Welcome back, ${(session?.user as any)?.fullName || session?.user?.name || "Admin"}`}
         description="Manage B2B consultation leads"

@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Target, Calendar, DollarSign } from "lucide-react"
+import { Plus, Target, Calendar, DollarSign, ArrowLeft } from "lucide-react"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 import type { Locale } from "@/lib/i18n-config"
 
 interface Campaign {
@@ -111,6 +112,15 @@ export default function DonationCampaignsPage({ params }: { params: { locale: Lo
 
   return (
     <div className="container py-10">
+      <div className="mb-6">
+        <Link href={`/${locale}/dashboard/admin`}>
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </Link>
+      </div>
+
       <DashboardHeader
         title={`Welcome back, ${(session?.user as any)?.fullName || session?.user?.name || "Admin"}`}
         description="Manage donation campaigns"

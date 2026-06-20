@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { QrCode, Plus, Download, Eye, Calendar, X } from "lucide-react"
+import { QrCode, Plus, Download, Eye, Calendar, X, ArrowLeft } from "lucide-react"
 
 interface Product {
   id: string
@@ -251,6 +251,15 @@ export default function QRTrackingPage() {
 
   return (
     <div className="space-y-6">
+      <div className="mb-6">
+        <Link href={`/${locale}/dashboard/admin`}>
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Dashboard
+          </Button>
+        </Link>
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">QR Code Tracking Management</h1>

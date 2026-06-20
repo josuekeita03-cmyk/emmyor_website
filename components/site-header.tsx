@@ -154,7 +154,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                     <ListItem href={`/${locale}/farmer-registration`} title={t.register}>
                       {t.registerDesc}
                     </ListItem>
-                    <ListItem href={`/${locale}/farmers/dashboard`} title={t.dashboard}>
+                    <ListItem href={`/${locale}/farmer-login`} title={t.dashboard}>
                       {t.dashboardDesc}
                     </ListItem>
                     <ListItem href={`/${locale}/farmers/resources`} title={t.resources}>
